@@ -60,7 +60,7 @@ export default function SensorMap({ detailed = false }: SensorMapProps) {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12", // You can try other styles like 'mapbox://styles/mapbox/light-v11'
+      style: "mapbox://styles/mapbox/satellite-streets-v12?optimize=true", // You can try other styles like 'mapbox://styles/mapbox/light-v11'
       center: [lng, lat],
       zoom: zoom,
       attributionControl: true, // Ensure attribution is visible as required by Mapbox
