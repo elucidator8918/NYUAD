@@ -25,15 +25,7 @@ export default function StatusOverview({ setActiveAlert }: StatusOverviewProps) 
   const fetchStatusData = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // your data here, if any
-        }),
-      });
+      const response = await fetch("/api/status");
       const data = await response.json()
       setStatusData(data)
       setActiveAlert(data.criticalAlerts > 0)

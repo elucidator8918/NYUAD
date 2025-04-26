@@ -26,7 +26,6 @@ export async function subscribeEmail(email: string) {
           where: { email: parsedEmail },
           data: { isActive: true },
         });
-        console.log("DONE")
         return { success: true, message: 'Subscription reactivated' };
       }
       return { success: true, message: 'Already subscribed' };
