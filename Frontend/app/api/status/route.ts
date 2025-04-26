@@ -1,17 +1,47 @@
-import { NextResponse } from "next/server"
+// app/api/status/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { sendNotifications } from '@/lib/emailService';
 
-export async function GET() {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
+// Secret key to protect the endpoint from unauthorized access
+const CRON_SECRET = process.env.CRON_SECRET;
+const NODE_ENV = process.env.NEXT_PUBLIC_NODE_ENV; // 'development' or 'production'
 
-  const statusData = {
-    system: "operational",
-    activeSensors: 24,
-    totalSensors: 25,
-    minorAnomalies: Math.floor(Math.random() * 5),
-    criticalAlerts: Math.random() < 0.05 ? 1 : 0, // 5% chance of critical alert
-    lastUpdated: new Date().toISOString(),
+export async function POST(request: NextRequest) {
+  // Validate authorization
+  const authHeader = request.headers.get('authorization');
+
+  const isAuthorized = 
+    NODE_ENV === 'development' || 
+    (authHeader && authHeader === `Bearer ${CRON_SECRET}`);
+
+  if (!isAuthorized) {
+    return NextResponse.json(
+      { success: false, message: 'Unauthorized' },
+      { status: 401 }
+    );
   }
-
-  return NextResponse.json(statusData)
+  
+  try {
+    const result = await sendNotifications();
+    
+    if (result.success) {
+      return NextResponse.json({ 
+        success: true, 
+        message: result.message || `Successfully sent notifications` 
+      });
+    } else {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Failed to send notifications',
+        error: result.error
+      }, { status: 500 });
+    }
+  } catch (error: any) {
+    console.error('Notification cron error:', error);
+    return NextResponse.json({ 
+      success: false, 
+      message: 'Failed to process notification request',
+      error: error.message
+    }, { status: 500 });
+  }
 }

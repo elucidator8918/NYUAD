@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -5,9 +7,62 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import { ArrowLeft, Bell, Volume2 } from "lucide-react"
+import { ArrowLeft, Bell, Check, Copy, Loader2, Volume2 } from "lucide-react"
+import { useState } from "react"
+import { toast } from "@/components/ui/use-toast"
+import { subscribeEmail } from "@/lib/emailService"
 
 export default function SettingsPage() {
+  const [copied, setCopied] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const copyApiKey = () => {
+    const apiKey = document.getElementById("api-key") as HTMLInputElement;
+    navigator.clipboard.writeText(apiKey.value);
+    setCopied(true);
+    
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await subscribeEmail(email);
+      
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        setEmail("");
+      } else {
+        throw new Error(result.message || "Failed to subscribe");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className="container mx-auto py-6 px-4 space-y-6">
       <div className="flex items-center gap-4">
@@ -63,12 +118,28 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Notifications</Label>
-                <Input id="email" placeholder="Enter your email" type="email" />
-              </div>
-
-              <Button>Save Notification Settings</Button>
+              <form onSubmit={handleSubscribe} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Notifications</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      id="email" 
+                      placeholder="Enter your email" 
+                      type="email" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Subscribe"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -84,7 +155,9 @@ export default function SettingsPage() {
                 <Label htmlFor="api-key">API Key</Label>
                 <div className="flex gap-2">
                   <Input id="api-key" value="sk_live_quantum_sensing_key_123456789" readOnly />
-                  <Button variant="outline">Copy</Button>
+                  <Button variant="outline" onClick={copyApiKey}>
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
                 </div>
               </div>
               <div className="flex items-center justify-between">
