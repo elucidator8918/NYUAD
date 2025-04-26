@@ -131,13 +131,14 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex-1"
               >
-                <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <Card className="h-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium">Magnetic Field Anomalies</CardTitle>
                     <CardDescription>Real-time quantum sensor readings</CardDescription>
@@ -152,34 +153,35 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex-1"
               >
-                <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <Card className="h-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium">Alert Frequency</CardTitle>
                     <CardDescription>Alerts by type over the past week</CardDescription>
                   </CardHeader>
-                  <CardContent className="h-[250px]">
+                  <CardContent className="h-[300px]">
                     <AlertFrequencyChart />
                   </CardContent>
                 </Card>
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-              >
-                <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">Recent Alerts</CardTitle>
-                    <CardDescription>Detected anomalies and warnings</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <AlertsPanel />
-                  </CardContent>
-                </Card>
-              </motion.div>
             </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Recent Alerts</CardTitle>
+                  <CardDescription>Detected anomalies and warnings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AlertsPanel />
+                </CardContent>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="sensors">
