@@ -97,7 +97,7 @@ export async function sendNotifications() {
         <hr />
         <p style="font-size: 12px; color: #666;">
           You're receiving this email because you subscribed to notifications. 
-          To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email={{email}}">click here</a>.
+          To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${email}">click here</a>.
         </p>
       </div>
     `;
