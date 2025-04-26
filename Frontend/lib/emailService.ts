@@ -84,50 +84,54 @@ export async function sendNotifications() {
       return { success: true, count: 0, message: 'No active subscribers found' };
     }
 
-    const emails = subscribers.map(subscriber => subscriber.email);
     const currentDate = new Date().toLocaleDateString();
     const currentTime = new Date().toLocaleTimeString();
-
     const subject = `System Notification - ${currentDate}`;
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>System Notification</h2>
-        <p>This is an automated notification sent at ${currentTime} on ${currentDate}.</p>
-        <p>Your system is running normally.</p>
-        <hr />
-        <p style="font-size: 12px; color: #666;">
-          You're receiving this email because you subscribed to notifications. 
-          To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${email}">click here</a>.
-        </p>
-      </div>
-    `;
-
+    
     let sentCount = 0;
-    for (let i = 0; i < emails.length; i += 50) {
-      const batch = emails.slice(i, i + 50);
+    
+    // Send emails in batches, but personalize each email
+    for (let i = 0; i < subscribers.length; i += 50) {
+      const batch = subscribers.slice(i, i + 50);
       
-      await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: batch,
-        subject,
-        html,
-        text: `This is a system notification sent at ${currentTime} on ${currentDate}.`
-      });      
+      // Send individual emails to each subscriber
+      for (const subscriber of batch) {
+        const html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>System Notification</h2>
+            <p>This is an automated notification sent at ${currentTime} on ${currentDate}.</p>
+            <p>Your system is running normally.</p>
+            <hr />
+            <p style="font-size: 12px; color: #666;">
+              You're receiving this email because you subscribed to notifications. 
+              To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${subscriber.email}">click here</a>.
+            </p>
+          </div>
+        `;
+        
+        await resend.emails.send({
+          from: 'onboarding@resend.dev',
+          to: subscriber.email,
+          subject,
+          html,
+          text: `This is a system notification sent at ${currentTime} on ${currentDate}. To unsubscribe, visit: ${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${subscriber.email}`
+        });
+      }
       
       sentCount += batch.length;
     }
 
     await prisma.notificationLog.create({
       data: {
-        batchSize: emails.length,
+        batchSize: subscribers.length,
         success: true,
       },
     });
 
     return { 
       success: true, 
-      count: emails.length, 
-      message: `Successfully sent notifications to ${emails.length} subscribers` 
+      count: subscribers.length, 
+      message: `Successfully sent notifications to ${subscribers.length} subscribers` 
     };
   } catch (error: any) {
     console.error('Failed to send notifications:', error);
