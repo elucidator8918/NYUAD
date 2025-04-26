@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 
-// Simulated sensor data
+// Simulated sensor data with Turkey locations (around Istanbul)
 const sensors = [
   {
     id: 1,
-    lat: 24.5239,
-    lng: 54.4346,
+    lat: 41.0082,
+    lng: 28.9784,
     name: "Sensor A1",
     status: "active",
     reading: 42.51,
@@ -14,8 +14,8 @@ const sensors = [
   },
   {
     id: 2,
-    lat: 24.4851,
-    lng: 54.3773,
+    lat: 41.0151,
+    lng: 29.0123,
     name: "Sensor A2",
     status: "active",
     reading: 42.48,
@@ -24,8 +24,8 @@ const sensors = [
   },
   {
     id: 3,
-    lat: 24.5133,
-    lng: 54.3773,
+    lat: 41.0224,
+    lng: 28.9456,
     name: "Sensor A3",
     status: "active",
     reading: 42.53,
@@ -34,8 +34,8 @@ const sensors = [
   },
   {
     id: 4,
-    lat: 24.4851,
-    lng: 54.4346,
+    lat: 40.9921,
+    lng: 28.9234,
     name: "Sensor B1",
     status: "warning",
     reading: 43.12,
@@ -44,8 +44,8 @@ const sensors = [
   },
   {
     id: 5,
-    lat: 24.4851,
-    lng: 54.406,
+    lat: 41.0055,
+    lng: 28.9678,
     name: "Sensor B2",
     status: "active",
     reading: 42.49,
@@ -54,8 +54,8 @@ const sensors = [
   },
   {
     id: 6,
-    lat: 24.4992,
-    lng: 54.406,
+    lat: 40.9856,
+    lng: 29.0345,
     name: "Sensor B3",
     status: "inactive",
     reading: 0,
@@ -64,8 +64,8 @@ const sensors = [
   },
   {
     id: 7,
-    lat: 24.5133,
-    lng: 54.406,
+    lat: 41.0189,
+    lng: 29.0456,
     name: "Sensor C1",
     status: "active",
     reading: 42.47,
@@ -74,8 +74,8 @@ const sensors = [
   },
   {
     id: 8,
-    lat: 24.4992,
-    lng: 54.3773,
+    lat: 41.0254,
+    lng: 28.9876,
     name: "Sensor C2",
     status: "active",
     reading: 42.52,
@@ -84,8 +84,8 @@ const sensors = [
   },
   {
     id: 9,
-    lat: 24.4992,
-    lng: 54.4346,
+    lat: 40.9987,
+    lng: 28.8765,
     name: "Sensor C3",
     status: "active",
     reading: 42.5,
