@@ -28,6 +28,11 @@ interface AlertsPanelProps {
 export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
+  const [filterSettings, setFilterSettings] = useState({
+    critical: true,
+    warning: true,
+    info: true
+  })
   const router = useRouter()
   const { toast } = useToast()
 
@@ -65,10 +70,8 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
         body: JSON.stringify({ action: "acknowledge", id }),
       })
 
-      // Update local state
       setAlerts(alerts.map((alert) => (alert.id === id ? { ...alert, acknowledged: true } : alert)))
 
-      // Show toast
       toast({
         title: "Alert Acknowledged",
         description: "The alert has been acknowledged and will be archived.",
@@ -82,6 +85,20 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
       })
     }
   }
+
+  const toggleFilter = (type: keyof typeof filterSettings) => {
+    setFilterSettings(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }))
+  }
+
+  const filteredAlerts = alerts.filter(alert => {
+    if (alert.level === "critical") return filterSettings.critical
+    if (alert.level === "warning") return filterSettings.warning
+    if (alert.level === "info") return filterSettings.info
+    return true
+  })
 
   const getAlertIcon = (level: string) => {
     switch (level) {
@@ -127,15 +144,27 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
           <h3 className="text-lg font-medium">Notification Settings</h3>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex items-center gap-2">
-              <Switch id="critical-alerts" defaultChecked />
+              <Switch 
+                id="critical-alerts" 
+                checked={filterSettings.critical}
+                onCheckedChange={() => toggleFilter("critical")}
+              />
               <Label htmlFor="critical-alerts">Critical Alerts</Label>
             </div>
             <div className="flex items-center gap-2">
-              <Switch id="warning-alerts" defaultChecked />
+              <Switch 
+                id="warning-alerts" 
+                checked={filterSettings.warning}
+                onCheckedChange={() => toggleFilter("warning")}
+              />
               <Label htmlFor="warning-alerts">Warning Alerts</Label>
             </div>
             <div className="flex items-center gap-2">
-              <Switch id="info-alerts" defaultChecked />
+              <Switch 
+                id="info-alerts" 
+                checked={filterSettings.info}
+                onCheckedChange={() => toggleFilter("info")}
+              />
               <Label htmlFor="info-alerts">Info Alerts</Label>
             </div>
           </div>
@@ -144,7 +173,7 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
 
       <div className="space-y-3">
         <AnimatePresence>
-          {alerts.slice(0, extended ? undefined : 3).map((alert, index) => (
+          {filteredAlerts.slice(0, extended ? undefined : 3).map((alert, index) => (
             <motion.div
               key={alert.id}
               initial={{ opacity: 0, y: 20 }}
@@ -203,7 +232,7 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
           ))}
         </AnimatePresence>
 
-        {!extended && alerts.length > 3 && (
+        {!extended && filteredAlerts.length > 3 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
             <Button
               variant="outline"
@@ -215,7 +244,7 @@ export default function AlertsPanel({ extended = false }: AlertsPanelProps) {
           </motion.div>
         )}
 
-        {alerts.length === 0 && (
+        {filteredAlerts.length === 0 && (
           <motion.div
             className="flex flex-col items-center justify-center py-8 text-muted-foreground"
             initial={{ opacity: 0 }}
