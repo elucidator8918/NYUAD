@@ -11,17 +11,14 @@ const EmailSchema = z.string().email("Invalid email address");
 
 export async function subscribeEmail(email: string) {
   try {
-    // Validate email
     const parsedEmail = EmailSchema.parse(email);
     
-    // Check if email already exists
     const existingSubscriber = await prisma.subscriber.findUnique({
       where: { email: parsedEmail },
     });
 
     if (existingSubscriber) {
       if (!existingSubscriber.isActive) {
-        // Reactivate if previously unsubscribed
         await prisma.subscriber.update({
           where: { email: parsedEmail },
           data: { isActive: true },
@@ -31,7 +28,6 @@ export async function subscribeEmail(email: string) {
       return { success: true, message: 'Already subscribed' };
     }
 
-    // Create new subscriber
     await prisma.subscriber.create({
       data: { email: parsedEmail },
     });
@@ -52,7 +48,6 @@ export async function unsubscribeEmail(email: string) {
   try {
     const parsedEmail = EmailSchema.parse(email);
     
-    // Check if subscriber exists
     const subscriber = await prisma.subscriber.findUnique({
       where: { email: parsedEmail },
     });
@@ -61,7 +56,6 @@ export async function unsubscribeEmail(email: string) {
       return { success: false, message: 'Email not found' };
     }
 
-    // Update subscriber to inactive
     await prisma.subscriber.update({
       where: { email: parsedEmail },
       data: { isActive: false },
@@ -81,7 +75,6 @@ export async function unsubscribeEmail(email: string) {
 
 export async function sendNotifications() {
   try {
-    // Get all active subscribers
     const subscribers = await prisma.subscriber.findMany({
       where: { isActive: true },
     });
@@ -95,7 +88,6 @@ export async function sendNotifications() {
     const currentDate = new Date().toLocaleDateString();
     const currentTime = new Date().toLocaleTimeString();
 
-    // Generate notification content
     const subject = `System Notification - ${currentDate}`;
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -105,27 +97,26 @@ export async function sendNotifications() {
         <hr />
         <p style="font-size: 12px; color: #666;">
           You're receiving this email because you subscribed to notifications. 
-          To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email={email}">click here</a>.
+          To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email={{email}}">click here</a>.
         </p>
       </div>
     `;
 
-    // Send emails in batches of 50
     let sentCount = 0;
     for (let i = 0; i < emails.length; i += 50) {
       const batch = emails.slice(i, i + 50);
       
       await resend.emails.send({
-        from: 'notifications@yourdomain.com',
-        bcc: batch,
-        subject: subject,
-        html: html,
-      });
+        from: 'onboarding@resend.dev',
+        to: batch,
+        subject,
+        html,
+        text: `This is a system notification sent at ${currentTime} on ${currentDate}.`
+      });      
       
       sentCount += batch.length;
     }
 
-    // Log the notification
     await prisma.notificationLog.create({
       data: {
         batchSize: emails.length,
@@ -141,7 +132,6 @@ export async function sendNotifications() {
   } catch (error: any) {
     console.error('Failed to send notifications:', error);
     
-    // Log the error
     await prisma.notificationLog.create({
       data: {
         batchSize: 0,
