@@ -32,8 +32,8 @@ export default function SensorMap({ detailed = false }: SensorMapProps) {
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedSensor, setSelectedSensor] = useState<number | null>(null)
-  const [lng, setLng] = useState(54.406)
-  const [lat, setLat] = useState(24.4992)
+  const [lng, setLng] = useState(28.979530)
+  const [lat, setLat] = useState(41.015137)
   const [zoom, setZoom] = useState(13)
   const markersRef = useRef<mapboxgl.Marker[]>([])
 
