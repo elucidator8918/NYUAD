@@ -50,4 +50,4 @@ Predictions from both streams are then combined to produce a **final, enhanced p
 
 The system architecture is summarized in the diagram below:
 
-![System Diagram](./pipeline.png)
+![System Diagram](./pipeline1.png)
