@@ -1,5 +1,5 @@
 # NYUAD
-# (Team 16 (Q-quake, ك-زلزال))
+# Team 16 (Q-quake, ك-زلزال)
 
 ## Overview
 This project proposes a hybrid seismic prediction system that integrates **quantum sensing** with **classical AI/ML models** to improve early detection of seismic activities (e.g., earthquakes).
