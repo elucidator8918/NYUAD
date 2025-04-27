@@ -5,8 +5,8 @@ import { sendNotifications } from '@/lib/emailService';
 export async function GET(request: NextRequest) {
   return NextResponse.json({
     system: "operational",
-    activeSensors: 24,
-    totalSensors: 25,
+    activeSensors: 9,
+    totalSensors: 12,
     minorAnomalies: 1,
     criticalAlerts: 0,
     lastUpdated: new Date().toISOString(), // updated dynamically
