@@ -1,11 +1,12 @@
 "use server"
 
-import { Resend } from 'resend';
 import { PrismaClient } from '@prisma/client';
 import { z } from "zod";
+import sgMail from '@sendgrid/mail';
 
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+// Initialize SendGrid with your API key
+sgMail.setApiKey(process.env.NEXT_PUBLIC_SENDGRID_API_KEY as string);
 
 const EmailSchema = z.string().email("Invalid email address");
 
@@ -107,20 +108,23 @@ export async function sendNotifications() {
         </div>
       `;
 
+      const textContent = `CRITICAL ALERT: Earthquake Detection - ${currentDate}. Critical alerts regarding earthquake detection in your monitored area. Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.`;
+
       try {
-        await resend.emails.send({
-          from: 'onboarding@resend.dev',
+        // Using SendGrid instead of Resend
+        const msg = {
           to: subscriber.email,
-          subject,
-          html,
-          text: `CRITICAL ALERT: Earthquake Detection - ${currentDate}. Critical alerts regarding earthquake detection in your monitored area. Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.`
-        });
+          from: process.env.SENDER_EMAIL || 'notifications@yourdomain.com', // Use a verified sender
+          subject: subject,
+          text: textContent,
+          html: html,
+        };
+        
+        await sgMail.send(msg);
         sentCount++;
       } catch (emailError) {
         console.error(`Failed to send email to ${subscriber.email}:`, emailError);
       }
-      
-      sentCount++;
     }
 
     await prisma.notificationLog.create({
