@@ -107,13 +107,18 @@ export async function sendNotifications() {
         </div>
       `;
 
-      await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: subscriber.email,
-        subject,
-        html,
-        text: `CRITICAL ALERT: Earthquake Detection - ${currentDate}. Critical alerts regarding earthquake detection in your monitored area. Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.`
-      });      
+      try {
+        await resend.emails.send({
+          from: 'onboarding@resend.dev',
+          to: subscriber.email,
+          subject,
+          html,
+          text: `CRITICAL ALERT: Earthquake Detection - ${currentDate}. Critical alerts regarding earthquake detection in your monitored area. Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.`
+        });
+        sentCount++;
+      } catch (emailError) {
+        console.error(`Failed to send email to ${subscriber.email}:`, emailError);
+      }
       
       sentCount++;
     }
