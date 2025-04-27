@@ -46,16 +46,8 @@ Predictions from both streams are then combined to produce a **final, enhanced p
 | Seismic Dataset | Traditional time-series data of acoustic activity and time-to-failure measurements. |
 | Combined Prediction | Merges predictions from both pipelines to enhance reliability. |
 
----
-
----
-
 ## Visualization
 
 The system architecture is summarized in the diagram below:
 
 ![System Diagram](./pipeline.png)
-
----
-
-
