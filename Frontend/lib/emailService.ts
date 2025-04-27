@@ -86,52 +86,49 @@ export async function sendNotifications() {
 
     const currentDate = new Date().toLocaleDateString();
     const currentTime = new Date().toLocaleTimeString();
-    const subject = `System Notification - ${currentDate}`;
+
+    const subject = `CRITICAL ALERT: Earthquake Detection - ${currentDate}`;
     
     let sentCount = 0;
     
-    // Send emails in batches, but personalize each email
-    for (let i = 0; i < subscribers.length; i += 50) {
-      const batch = subscribers.slice(i, i + 50);
+    // Send individual emails to each subscriber
+    for (const subscriber of subscribers) {
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>CRITICAL ALERT: Earthquake Detection</h2>
+          <p>This is an urgent notification sent at ${currentTime} on ${currentDate}.</p>
+          <p><strong>Critical alerts regarding earthquake detection in your monitored area.</strong></p>
+          <p>Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.</p>
+          <hr />
+          <p style="font-size: 12px; color: #666;">
+            You're receiving this email because you subscribed to notifications. 
+            To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${subscriber.email}">click here</a>.
+          </p>
+        </div>
+      `;
+
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: subscriber.email,
+        subject,
+        html,
+        text: `CRITICAL ALERT: Earthquake Detection - ${currentDate}. Critical alerts regarding earthquake detection in your monitored area. Please check the monitoring system dashboard for more details and follow your organization's emergency protocols.`
+      });      
       
-      // Send individual emails to each subscriber
-      for (const subscriber of batch) {
-        const html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>System Notification</h2>
-            <p>This is an automated notification sent at ${currentTime} on ${currentDate}.</p>
-            <p>Your system is running normally.</p>
-            <hr />
-            <p style="font-size: 12px; color: #666;">
-              You're receiving this email because you subscribed to notifications. 
-              To unsubscribe, <a href="${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${subscriber.email}">click here</a>.
-            </p>
-          </div>
-        `;
-        
-        await resend.emails.send({
-          from: 'onboarding@resend.dev',
-          to: subscriber.email,
-          subject,
-          html,
-          text: `This is a system notification sent at ${currentTime} on ${currentDate}. To unsubscribe, visit: ${process.env.NEXT_PUBLIC_URL}/api/subscribe/unsubscribe?email=${subscriber.email}`
-        });
-      }
-      
-      sentCount += batch.length;
+      sentCount++;
     }
 
     await prisma.notificationLog.create({
       data: {
-        batchSize: subscribers.length,
+        batchSize: sentCount,
         success: true,
       },
     });
 
     return { 
       success: true, 
-      count: subscribers.length, 
-      message: `Successfully sent notifications to ${subscribers.length} subscribers` 
+      count: sentCount, 
+      message: `Successfully sent notifications to ${sentCount} subscribers` 
     };
   } catch (error: any) {
     console.error('Failed to send notifications:', error);
