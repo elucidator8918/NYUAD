@@ -114,7 +114,7 @@ export async function sendNotifications() {
         // Using SendGrid instead of Resend
         const msg = {
           to: subscriber.email,
-          from: process.env.SENDER_EMAIL || 'notifications@yourdomain.com', // Use a verified sender
+          from: 'miqdadyayah0@gmail.com',
           subject: subject,
           text: textContent,
           html: html,
